@@ -44,6 +44,9 @@ TagManager:
   - name: Bars
     uniqueID: 3275178153
     locked: 0
+  - name: HalfBars
+    uniqueID: 524405031
+    locked: 0
   - name: Joints
     uniqueID: 3211779913
     locked: 0
