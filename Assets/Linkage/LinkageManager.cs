@@ -50,9 +50,4 @@ public class LinkageManager : MonoBehaviour
             lineRenderers[i].SetPosition(1, joints[nextIndex].position);
         }
     }
-
-    private void Update()
-    {
-        UpdateLinkage();
-    }
 }
