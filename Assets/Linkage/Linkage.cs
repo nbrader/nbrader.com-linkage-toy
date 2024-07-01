@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class LinkageManager : MonoBehaviour
+public class Linkage : MonoBehaviour
 {
-    public static LinkageManager Instance;
+    public static Linkage Instance;
 
-    public List<DraggableJoint> joints;
+    public List<Joint> joints;
     public GameObject barPrefab;  // Prefab for a bar
     public GameObject halfBarPrefab;  // Prefab for a half bar
     float barThickness = 0.1f;  // Bar thickness
@@ -42,8 +42,8 @@ public class LinkageManager : MonoBehaviour
             halfBars[i * 2 + 1] = halfBarObj2;
 
             // Assign DraggableHalfBar components and their references
-            DraggableHalfBar halfBar1 = halfBarObj1.GetComponent<DraggableHalfBar>();
-            DraggableHalfBar halfBar2 = halfBarObj2.GetComponent<DraggableHalfBar>();
+            HalfBar halfBar1 = halfBarObj1.GetComponent<HalfBar>();
+            HalfBar halfBar2 = halfBarObj2.GetComponent<HalfBar>();
 
             // Ensure half bars are created properly with the necessary components
             if (halfBar1 != null && halfBar2 != null)
@@ -97,7 +97,7 @@ public class LinkageManager : MonoBehaviour
         }
     }
 
-    public void MoveJoint(DraggableJoint joint, Vector3 position)
+    public void MoveJoint(Joint joint, Vector3 position)
     {
         if (joint != null)
         {
@@ -106,12 +106,12 @@ public class LinkageManager : MonoBehaviour
         }
     }
 
-    public DraggableJoint FindClosestJoint(Vector3 position)
+    public Joint FindClosestJoint(Vector3 position)
     {
-        DraggableJoint closest = null;
+        Joint closest = null;
         float minDistance = float.MaxValue;
 
-        foreach (DraggableJoint joint in joints)
+        foreach (Joint joint in joints)
         {
             float distance = Vector3.Distance(position, joint.transform.position);
             if (distance < minDistance)

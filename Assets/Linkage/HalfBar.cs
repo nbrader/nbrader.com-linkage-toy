@@ -1,17 +1,17 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class DraggableHalfBar : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class HalfBar : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
-    private DraggableJoint pivotJoint; // The pivot joint
-    private DraggableJoint oppositeJoint; // The opposite end of the half bar
+    private Joint pivotJoint; // The pivot joint
+    private Joint oppositeJoint; // The opposite end of the half bar
 
     private Vector3 initialOffset;
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         // Find the closest joint to the cursor
-        pivotJoint = LinkageManager.Instance.FindClosestJoint(ScreenToWorldPoint(eventData.position));
+        pivotJoint = Linkage.Instance.FindClosestJoint(ScreenToWorldPoint(eventData.position));
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -28,7 +28,7 @@ public class DraggableHalfBar : MonoBehaviour, IDragHandler, IBeginDragHandler, 
             // Maintain the distance between the joint and the opposite end
             oppositeJoint.transform.position = pivotJoint.transform.position + direction * Vector3.Distance(pivotJoint.transform.position, oppositeJoint.transform.position);
 
-            LinkageManager.Instance.UpdateLinkage();
+            Linkage.Instance.UpdateLinkage();
         }
     }
 
@@ -45,7 +45,7 @@ public class DraggableHalfBar : MonoBehaviour, IDragHandler, IBeginDragHandler, 
         return Camera.main.ScreenToWorldPoint(screenPoint);
     }
 
-    public void Initialize(DraggableJoint pivotJoint, DraggableJoint oppositeJoint)
+    public void Initialize(Joint pivotJoint, Joint oppositeJoint)
     {
         this.pivotJoint = pivotJoint;
         this.oppositeJoint = oppositeJoint;
