@@ -8,7 +8,7 @@ public class DraggableJoint : MonoBehaviour, IDragHandler, IBeginDragHandler, IE
     public void OnBeginDrag(PointerEventData eventData)
     {
         // Find the closest joint to the cursor
-        closestJoint = FindClosestJoint(eventData);
+        closestJoint = LinkageManager.Instance.FindClosestJoint(ScreenToWorldPoint(eventData.position));
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -16,13 +16,11 @@ public class DraggableJoint : MonoBehaviour, IDragHandler, IBeginDragHandler, IE
         if (closestJoint != null)
         {
             // Convert screen position to world position
-            Vector3 screenPoint = new Vector3(eventData.position.x, eventData.position.y, -Camera.main.transform.position.z);
-            Vector3 worldPoint = Camera.main.ScreenToWorldPoint(screenPoint);
+            Vector3 worldPoint = ScreenToWorldPoint(eventData.position);
             worldPoint.z = 0; // Ensure the joint stays on the z = 0 plane
-            closestJoint.position = worldPoint;
 
-            // Update the linkage
-            LinkageManager.Instance.UpdateLinkage();
+            // Move the joint via the LinkageManager
+            LinkageManager.Instance.MoveJoint(closestJoint, worldPoint);
         }
     }
 
@@ -32,25 +30,9 @@ public class DraggableJoint : MonoBehaviour, IDragHandler, IBeginDragHandler, IE
         closestJoint = null;
     }
 
-    private Transform FindClosestJoint(PointerEventData eventData)
+    private Vector3 ScreenToWorldPoint(Vector2 screenPosition)
     {
-        Transform closest = null;
-        float minDistance = float.MaxValue;
-
-        // Convert screen position to world position
-        Vector3 screenPoint = new Vector3(eventData.position.x, eventData.position.y, -Camera.main.transform.position.z);
-        Vector3 worldPoint = Camera.main.ScreenToWorldPoint(screenPoint);
-
-        foreach (Transform joint in LinkageManager.Instance.joints)
-        {
-            float distance = Vector3.Distance(worldPoint, joint.position);
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                closest = joint;
-            }
-        }
-
-        return closest;
+        Vector3 screenPoint = new Vector3(screenPosition.x, screenPosition.y, -Camera.main.transform.position.z);
+        return Camera.main.ScreenToWorldPoint(screenPoint);
     }
 }

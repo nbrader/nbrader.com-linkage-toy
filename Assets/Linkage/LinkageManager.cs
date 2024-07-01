@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class LinkageManager : MonoBehaviour
 {
@@ -79,5 +80,32 @@ public class LinkageManager : MonoBehaviour
             halfBars[i * 2 + 1].transform.right = prevDirection;
             halfBars[i * 2 + 1].transform.localScale = new Vector3(prevHalfDistance, barThickness, barThickness);
         }
+    }
+
+    public void MoveJoint(Transform joint, Vector3 position)
+    {
+        if (joint != null)
+        {
+            joint.position = position;
+            UpdateLinkage();
+        }
+    }
+
+    public Transform FindClosestJoint(Vector3 position)
+    {
+        Transform closest = null;
+        float minDistance = float.MaxValue;
+
+        foreach (Transform joint in joints)
+        {
+            float distance = Vector3.Distance(position, joint.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closest = joint;
+            }
+        }
+
+        return closest;
     }
 }
