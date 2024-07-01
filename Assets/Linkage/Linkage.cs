@@ -133,7 +133,7 @@ public class Linkage : MonoBehaviour
         return closest;
     }
 
-    public HalfBar? FindClosestHalfBar(Vector3 inputPosition)
+    public HalfBar FindClosestHalfBar(Vector3 inputPosition)
     {
         HalfBar closest = null;
         float minDistance = float.MaxValue;
