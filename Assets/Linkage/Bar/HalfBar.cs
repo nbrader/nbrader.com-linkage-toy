@@ -8,17 +8,17 @@ public class HalfBar : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragH
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        parentLinkage.OnBeginDrag(LinkagePartType.HalfBar, eventData);
+        parentLinkage.OnBeginDrag(eventData);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        parentLinkage.OnDrag(LinkagePartType.HalfBar, eventData);
+        parentLinkage.OnDrag(eventData);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        parentLinkage.OnEndDrag(LinkagePartType.HalfBar, eventData);
+        parentLinkage.OnEndDrag(eventData);
     }
 
     public void Initialize(Linkage parentLinkage, Joint pivotJoint, Joint oppositeJoint)

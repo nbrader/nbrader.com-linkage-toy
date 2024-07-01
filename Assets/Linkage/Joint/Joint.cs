@@ -8,16 +8,16 @@ public class Joint : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        parentLinkage.OnBeginDrag(LinkagePartType.Joint, eventData);
+        parentLinkage.OnBeginDrag(eventData);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        parentLinkage.OnDrag(LinkagePartType.Joint, eventData);
+        parentLinkage.OnDrag(eventData);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        parentLinkage.OnEndDrag(LinkagePartType.Joint, eventData);
+        parentLinkage.OnEndDrag(eventData);
     }
 }
