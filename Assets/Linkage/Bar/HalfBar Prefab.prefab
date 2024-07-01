@@ -94,6 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2992072281228274712}
   - component: {fileID: 7059079931972751040}
+  - component: {fileID: 577008551525365659}
   m_Layer: 0
   m_Name: HalfBar Prefab
   m_TagString: Untagged
@@ -124,7 +125,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3839745485931276093}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -143,3 +144,17 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &577008551525365659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3839745485931276093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71dc41b73768c4240b8cfd2ed5485710, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  joint: {fileID: 0}
+  oppositeEnd: {fileID: 0}

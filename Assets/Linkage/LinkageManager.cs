@@ -6,7 +6,7 @@ public class LinkageManager : MonoBehaviour
 {
     public static LinkageManager Instance;
 
-    public List<Transform> joints;
+    public List<DraggableJoint> joints;
     public GameObject barPrefab;  // Prefab for a bar
     public GameObject halfBarPrefab;  // Prefab for a half bar
     float barThickness = 0.1f;  // Bar thickness
@@ -40,6 +40,21 @@ public class LinkageManager : MonoBehaviour
             GameObject halfBarObj2 = Instantiate(halfBarPrefab, transform);
             halfBars[i * 2] = halfBarObj1;
             halfBars[i * 2 + 1] = halfBarObj2;
+
+            // Assign DraggableHalfBar components and their references
+            DraggableHalfBar halfBar1 = halfBarObj1.GetComponent<DraggableHalfBar>();
+            DraggableHalfBar halfBar2 = halfBarObj2.GetComponent<DraggableHalfBar>();
+
+            // Ensure half bars are created properly with the necessary components
+            if (halfBar1 != null && halfBar2 != null)
+            {
+                halfBar1.Initialize(joints[i], (i + 1 < joints.Count) ? joints[i + 1] : joints[0]);
+                halfBar2.Initialize(joints[i], (i - 1 >= 0) ? joints[i - 1] : joints[joints.Count - 1]);
+            }
+            else
+            {
+                Debug.LogError("DraggableHalfBar component missing on half bar prefab.");
+            }
         }
 
         UpdateLinkage();
@@ -53,9 +68,9 @@ public class LinkageManager : MonoBehaviour
         {
             int nextIndex = (i + 1) % joints.Count;
             int prevIndex = (i - 1 + joints.Count) % joints.Count;
-            Transform currentJoint = joints[i];
-            Transform nextJoint = joints[nextIndex];
-            Transform prevJoint = joints[prevIndex];
+            Transform currentJoint = joints[i].transform;
+            Transform nextJoint = joints[nextIndex].transform;
+            Transform prevJoint = joints[prevIndex].transform;
 
             // Calculate the position and scale for the full bar
             Vector3 direction = nextJoint.position - currentJoint.position;
@@ -82,23 +97,23 @@ public class LinkageManager : MonoBehaviour
         }
     }
 
-    public void MoveJoint(Transform joint, Vector3 position)
+    public void MoveJoint(DraggableJoint joint, Vector3 position)
     {
         if (joint != null)
         {
-            joint.position = position;
+            joint.transform.position = position;
             UpdateLinkage();
         }
     }
 
-    public Transform FindClosestJoint(Vector3 position)
+    public DraggableJoint FindClosestJoint(Vector3 position)
     {
-        Transform closest = null;
+        DraggableJoint closest = null;
         float minDistance = float.MaxValue;
 
-        foreach (Transform joint in joints)
+        foreach (DraggableJoint joint in joints)
         {
-            float distance = Vector3.Distance(position, joint.position);
+            float distance = Vector3.Distance(position, joint.transform.position);
             if (distance < minDistance)
             {
                 minDistance = distance;

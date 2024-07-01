@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public class DraggableJoint : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
-    private Transform closestJoint;
+    private DraggableJoint closestJoint;
 
     public void OnBeginDrag(PointerEventData eventData)
     {
