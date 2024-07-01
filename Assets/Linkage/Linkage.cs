@@ -196,19 +196,6 @@ public class Linkage : MonoBehaviour
         }
     }
 
-    // Helper function to find closest point on a line segment
-    private Vector3 ClosestPointOnLineSegment(Vector3 p, Vector3 start, Vector3 end)
-    {
-        Vector3 line = end - start;
-        float lineMagnitude = line.magnitude;
-        Vector3 lineDirection = line / lineMagnitude;
-
-        float t = Mathf.Clamp01(Vector3.Dot(p - start, lineDirection) / lineMagnitude);
-        Vector3 closestPoint = start + t * line;
-
-        return closestPoint;
-    }
-
     public void OnBeginDrag(LinkagePartType partType, PointerEventData eventData)
     {
         switch (partType)
