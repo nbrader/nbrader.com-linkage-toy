@@ -4,8 +4,6 @@ using UnityEngine.EventSystems;
 
 public class Linkage : MonoBehaviour
 {
-    public static Linkage Instance;
-
     public List<Joint> joints;
     public GameObject barPrefab;  // Prefab for a bar
     public GameObject halfBarPrefab;  // Prefab for a half bar
@@ -16,12 +14,15 @@ public class Linkage : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
-
-        if (joints == null || joints.Count < 2)
+        if (joints == null || joints.Count != 4)
         {
-            Debug.LogError("Insufficient joints provided. At least 2 joints are required.");
+            Debug.LogError("4 joints are required.");
             return;
+        }
+
+        foreach (var joint in joints)
+        {
+            joint.parentLinkage = this;
         }
 
         // Initialize bars and halfBars arrays
@@ -48,8 +49,8 @@ public class Linkage : MonoBehaviour
             // Ensure half bars are created properly with the necessary components
             if (halfBar1 != null && halfBar2 != null)
             {
-                halfBar1.Initialize(joints[i], (i + 1 < joints.Count) ? joints[i + 1] : joints[0]);
-                halfBar2.Initialize(joints[i], (i - 1 >= 0) ? joints[i - 1] : joints[joints.Count - 1]);
+                halfBar1.Initialize(this, joints[i], (i + 1 < joints.Count) ? joints[i + 1] : joints[0]);
+                halfBar2.Initialize(this, joints[i], (i - 1 >= 0) ? joints[i - 1] : joints[joints.Count - 1]);
             }
             else
             {

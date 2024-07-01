@@ -3,12 +3,15 @@ using UnityEngine.EventSystems;
 
 public class Joint : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
+    [HideInInspector]
+    public Linkage parentLinkage;
+
     private Joint closestJoint;
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         // Find the closest joint to the cursor
-        closestJoint = Linkage.Instance.FindClosestJoint(ScreenToWorldPoint(eventData.position));
+        closestJoint = parentLinkage.FindClosestJoint(ScreenToWorldPoint(eventData.position));
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -20,7 +23,7 @@ public class Joint : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
             worldPoint.z = 0; // Ensure the joint stays on the z = 0 plane
 
             // Move the joint via the LinkageManager
-            Linkage.Instance.MoveJoint(closestJoint, worldPoint);
+            parentLinkage.MoveJoint(closestJoint, worldPoint);
         }
     }
 
