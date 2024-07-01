@@ -135,25 +135,6 @@ public class Linkage : MonoBehaviour
 
     public HalfBar FindClosestHalfBar(Vector3 inputPosition)
     {
-        HalfBar closest = null;
-        float minDistance = float.MaxValue;
-
-        foreach (HalfBar halfBar in halfBars)
-        {
-            // Determine the closest point on the edge represented by the HalfBar
-            Vector3 closestPointOnEdge = ClosestPointOnLineSegment(inputPosition, halfBar.pivotJoint.transform.position, halfBar.oppositeJoint.transform.position);
-
-            // Calculate distance from input position to this closest point
-            float distance = Vector3.Distance(inputPosition, closestPointOnEdge);
-
-            // Update closest HalfBar if this one is closer
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                closest = halfBar;
-            }
-        }
-
         Edge3D[] edges = halfBars.Select(bar => new Edge3D("", bar.pivotJoint.transform.position, (bar.pivotJoint.transform.position + bar.oppositeJoint.transform.position)/2)).ToArray();
 
         // Check _EDGES_ for nearest point
