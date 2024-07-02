@@ -15,8 +15,9 @@ public class Linkage : MonoBehaviour
     public GameObject barPrefab;  // Prefab for a bar
     public GameObject halfBarPrefab;  // Prefab for a half bar
     readonly float barVisibleThickness = 0.1f;
-    readonly float barColliderThickness = 10f;
+    readonly float barColliderThicknessSize = 10f;
     readonly float jointColliderThickness = 0.5f; // In fact isn't the collider thickness but that's how it appears provided it's smaller than the true collider thickness.
+    readonly float barColliderThickness = 0.5f;
 
     private GameObject[] bars;
     private HalfBar[] halfBars;
@@ -95,7 +96,7 @@ public class Linkage : MonoBehaviour
             bars[i].transform.position = currentJoint.position;
             bars[i].transform.right = direction;
             bars[i].transform.localScale = new Vector3(distance, barVisibleThickness, 1);
-            bars[i].GetComponent<BoxCollider2D>().size = new Vector2(1, barColliderThickness);
+            bars[i].GetComponent<BoxCollider2D>().size = new Vector2(1, barColliderThicknessSize);
 
             // Calculate and update half bar positions, rotations, and scales
             Vector3 nextDirection = (nextJoint.position - currentJoint.position) / 2;
@@ -106,12 +107,12 @@ public class Linkage : MonoBehaviour
             halfBars[i * 2].transform.position = currentJoint.position;
             halfBars[i * 2].transform.right = nextDirection;
             halfBars[i * 2].transform.localScale = new Vector3(nextHalfDistance, barVisibleThickness, 1);
-            halfBars[i * 2].GetComponent<BoxCollider2D>().size = new Vector2(1, barColliderThickness);
+            halfBars[i * 2].GetComponent<BoxCollider2D>().size = new Vector2(1, barColliderThicknessSize);
 
             halfBars[i * 2 + 1].transform.position = currentJoint.position;
             halfBars[i * 2 + 1].transform.right = prevDirection;
             halfBars[i * 2 + 1].transform.localScale = new Vector3(prevHalfDistance, barVisibleThickness, 1);
-            halfBars[i * 2 + 1].GetComponent<BoxCollider2D>().size = new Vector2(1, barColliderThickness);
+            halfBars[i * 2 + 1].GetComponent<BoxCollider2D>().size = new Vector2(1, barColliderThicknessSize);
         }
     }
 
@@ -209,18 +210,29 @@ public class Linkage : MonoBehaviour
     {
         if (isDragging) return;
 
-        var closestJointData = FindClosestJoint(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-        var closestHalfBarData = FindClosestHalfBar(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        var pointerPos = Camera.main.ScreenToWorldPoint(Input.mousePosition) + Vector3.forward * 10;
 
-        if (closestHalfBarData == null || closestJointData.closestDistance < closestHalfBarData.Value.closestDistance)
+        var closestJointData = FindClosestJoint(pointerPos);
+        var closestJointDistance = closestJointData.closestDistance;
+
+        if (closestJointDistance < jointColliderThickness)
         {
             closestJoint = closestJointData.closestJoint;
             closestHalfBar = null;
         }
         else
         {
-            closestJoint = null;
-            closestHalfBar = closestHalfBarData.Value.closestHalfBar;
+            var closestHalfBarData = FindClosestHalfBar(pointerPos);
+            if (closestHalfBarData.HasValue && closestHalfBarData.Value.closestDistance <= barColliderThickness)
+            {
+                closestJoint = null;
+                closestHalfBar = closestHalfBarData.Value.closestHalfBar;
+            }
+            else
+            {
+                closestJoint = null;
+                closestHalfBar = null;
+            }
         }
         
         // Reset highlights
