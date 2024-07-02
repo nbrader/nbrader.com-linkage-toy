@@ -5,6 +5,7 @@ public class Joint : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 {
     [HideInInspector]
     public Linkage parentLinkage;
+    public SpriteRenderer spriteRenderer;
 
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -19,5 +20,10 @@ public class Joint : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
     public void OnEndDrag(PointerEventData eventData)
     {
         parentLinkage.OnEndDrag(eventData);
+    }
+
+    public void Highlight(bool isHighlight)
+    {
+        spriteRenderer.color = isHighlight ? Color.yellow : Color.white;
     }
 }

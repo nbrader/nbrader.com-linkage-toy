@@ -21,6 +21,11 @@ public class Linkage : MonoBehaviour
     private GameObject[] bars;
     private HalfBar[] halfBars;
 
+    private Joint closestJoint;
+    private HalfBar closestHalfBar;
+    private LinkagePartType latestDraggedPartType = LinkagePartType.Joint;
+    private bool isDragging = false; // Flag to indicate if dragging is in progress
+
     private void Awake()
     {
         if (joints == null || joints.Count != 4)
@@ -134,12 +139,12 @@ public class Linkage : MonoBehaviour
             }
         }
 
-        return (closestJoint : closest, closestDistance : minDistance);
+        return (closestJoint: closest, closestDistance: minDistance);
     }
 
     public (HalfBar closestHalfBar, float closestDistance)? FindClosestHalfBar(Vector3 inputPosition)
     {
-        Edge3D[] edges = halfBars.Select(bar => new Edge3D("", bar.pivotJoint.transform.position, (bar.pivotJoint.transform.position + bar.oppositeJoint.transform.position)/2)).ToArray();
+        Edge3D[] edges = halfBars.Select(bar => new Edge3D("", bar.pivotJoint.transform.position, (bar.pivotJoint.transform.position + bar.oppositeJoint.transform.position) / 2)).ToArray();
 
         // Check _EDGES_ for nearest point
         Vector3 nearestPointOnEdge = Vector3.zero;
@@ -200,45 +205,58 @@ public class Linkage : MonoBehaviour
         }
     }
 
-    private Joint closestJoint;
-    private HalfBar closestHalfBar;
-    private LinkagePartType latestDraggedPartType = LinkagePartType.Joint;
+    private void Update()
+    {
+        if (isDragging) return;
+
+        var closestJointData = FindClosestJoint(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        var closestHalfBarData = FindClosestHalfBar(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+
+        if (closestHalfBarData == null || closestJointData.closestDistance < closestHalfBarData.Value.closestDistance)
+        {
+            closestJoint = closestJointData.closestJoint;
+            closestHalfBar = null;
+        }
+        else
+        {
+            closestJoint = null;
+            closestHalfBar = closestHalfBarData.Value.closestHalfBar;
+        }
+        
+        // Reset highlights
+        foreach (Joint joint in joints)
+        {
+            joint.Highlight(false);
+        }
+        foreach (HalfBar halfBar in halfBars)
+        {
+            halfBar.Highlight(false);
+        }
+
+        // Set latest closes highlight
+        if (closestJoint != null)
+        {
+            closestJoint.Highlight(true);
+        }
+
+        if (closestHalfBar != null)
+        {
+            closestHalfBar.Highlight(true);
+        }
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
-        var closestJointData = FindClosestJoint(ScreenToWorldPoint(eventData.position));
-        closestJoint = closestJointData.closestJoint;
-        var closestJointDistance = closestJointData.closestDistance;
-
-        if (closestJointDistance < jointColliderThickness)
+        isDragging = true; // Set the dragging flag to true
+        if (closestJoint != null)
         {
             latestDraggedPartType = LinkagePartType.Joint;
             OnBeginDragJoint(eventData);
         }
-        else
+        else if (closestHalfBar != null)
         {
-	        var closestHalfBarData = FindClosestHalfBar(ScreenToWorldPoint(eventData.position));
-
-	        if (closestHalfBarData == null)
-	        {
-	            latestDraggedPartType = LinkagePartType.Joint;
-	            OnBeginDragJoint(eventData);
-	        }
-	        else
-	        {
-	            closestHalfBar = closestHalfBarData.Value.closestHalfBar;
-	            var closestHalfBarDistance = closestHalfBarData.Value.closestDistance;
-
-	            if (closestJointDistance <= closestHalfBarDistance)
-	            {
-	                latestDraggedPartType = LinkagePartType.Joint;
-	                OnBeginDragJoint(eventData);
-	            }
-	            else
-	            {
-	                latestDraggedPartType = LinkagePartType.HalfBar;
-	                OnBeginDragHalfBar(eventData);
-	            }
-	        }
+            latestDraggedPartType = LinkagePartType.HalfBar;
+            OnBeginDragHalfBar(eventData);
         }
     }
 
@@ -256,6 +274,7 @@ public class Linkage : MonoBehaviour
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        isDragging = false; // Reset the dragging flag to false
         if (latestDraggedPartType == LinkagePartType.Joint)
         {
             OnEndDragJoint(eventData);

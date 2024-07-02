@@ -131,6 +131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentLinkage: {fileID: 0}
+  spriteRenderer: {fileID: 7645985071925137160}
 --- !u!58 &8535583110840138751
 CircleCollider2D:
   m_ObjectHideFlags: 0
