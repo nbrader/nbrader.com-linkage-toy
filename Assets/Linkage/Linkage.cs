@@ -303,8 +303,7 @@ public class Linkage : MonoBehaviour
     public void OnEndDragHalfBar(PointerEventData eventData)
     {
         // Optional: Handle end drag logic if needed
-        closestHalfBar.pivotJoint = null;
-        closestHalfBar.oppositeJoint = null;
+        closestHalfBar = null;
     }
 
     private Vector3 ScreenToWorldPoint(Vector2 screenPosition)
