@@ -16,6 +16,7 @@ public class Linkage : MonoBehaviour
     public GameObject halfBarPrefab;  // Prefab for a half bar
     float barVisibleThickness = 0.1f;
     float barColliderThickness = 10f;
+    float jointColliderThickness = 0.5f; // In fact isn't the collider thickness but that's how it appears provided it's smaller than the true collider thickness.
 
     private GameObject[] bars;
     private HalfBar[] halfBars;
@@ -208,28 +209,36 @@ public class Linkage : MonoBehaviour
         closestJoint = closestJointData.closestJoint;
         var closestJointDistance = closestJointData.closestDistance;
 
-        var closestHalfBarData = FindClosestHalfBar(ScreenToWorldPoint(eventData.position));
-
-        if (closestHalfBarData == null)
+        if (closestJointDistance < jointColliderThickness)
         {
             latestDraggedPartType = LinkagePartType.Joint;
             OnBeginDragJoint(eventData);
         }
         else
         {
-            closestHalfBar = closestHalfBarData.Value.closestHalfBar;
-            var closestHalfBarDistance = closestHalfBarData.Value.closestDistance;
+	        var closestHalfBarData = FindClosestHalfBar(ScreenToWorldPoint(eventData.position));
 
-            if (closestJointDistance <= closestHalfBarDistance)
-            {
-                latestDraggedPartType = LinkagePartType.Joint;
-                OnBeginDragJoint(eventData);
-            }
-            else
-            {
-                latestDraggedPartType = LinkagePartType.HalfBar;
-                OnBeginDragHalfBar(eventData);
-            }
+	        if (closestHalfBarData == null)
+	        {
+	            latestDraggedPartType = LinkagePartType.Joint;
+	            OnBeginDragJoint(eventData);
+	        }
+	        else
+	        {
+	            closestHalfBar = closestHalfBarData.Value.closestHalfBar;
+	            var closestHalfBarDistance = closestHalfBarData.Value.closestDistance;
+
+	            if (closestJointDistance <= closestHalfBarDistance)
+	            {
+	                latestDraggedPartType = LinkagePartType.Joint;
+	                OnBeginDragJoint(eventData);
+	            }
+	            else
+	            {
+	                latestDraggedPartType = LinkagePartType.HalfBar;
+	                OnBeginDragHalfBar(eventData);
+	            }
+	        }
         }
     }
 
