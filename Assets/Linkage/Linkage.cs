@@ -14,9 +14,9 @@ public class Linkage : MonoBehaviour
     public List<Joint> joints;
     public GameObject barPrefab;  // Prefab for a bar
     public GameObject halfBarPrefab;  // Prefab for a half bar
-    float barVisibleThickness = 0.1f;
-    float barColliderThickness = 10f;
-    float jointColliderThickness = 0.5f; // In fact isn't the collider thickness but that's how it appears provided it's smaller than the true collider thickness.
+    readonly float barVisibleThickness = 0.1f;
+    readonly float barColliderThickness = 10f;
+    readonly float jointColliderThickness = 0.5f; // In fact isn't the collider thickness but that's how it appears provided it's smaller than the true collider thickness.
 
     private GameObject[] bars;
     private HalfBar[] halfBars;
