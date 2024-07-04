@@ -1,0 +1,1 @@
+There are bugs where nodes can go missing and I want to make breaking the constraints more explanatory than it is currently. Plus it just could be made pretties in general and could do with a way to translate and zoom.
