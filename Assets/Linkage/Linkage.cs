@@ -64,8 +64,8 @@ public class Linkage : MonoBehaviour
             // Ensure half bars are created properly with the necessary components
             if (halfBar1 != null && halfBar2 != null)
             {
-                halfBar1.Initialize(this, joints[i], (i + 1 < joints.Count) ? joints[i + 1] : joints[0]);
-                halfBar2.Initialize(this, joints[i], (i - 1 >= 0) ? joints[i - 1] : joints[joints.Count - 1]);
+                halfBar1.Initialize(this, joints[i], joints[Maths.mod(i + 1, joints.Count)], joints[Maths.mod(i + 2, joints.Count)], joints[Maths.mod(i + 3, joints.Count)]);
+                halfBar2.Initialize(this, joints[i], joints[Maths.mod(i - 1, joints.Count)], joints[Maths.mod(i - 2, joints.Count)], joints[Maths.mod(i - 3, joints.Count)]);
             }
             else
             {
@@ -73,10 +73,10 @@ public class Linkage : MonoBehaviour
             }
         }
 
-        UpdateLinkage();
+        UpdateBars();
     }
 
-    public void UpdateLinkage()
+    public void UpdateBars()
     {
         if (joints == null || joints.Count < 2) return;
 
@@ -121,7 +121,7 @@ public class Linkage : MonoBehaviour
         if (joint != null)
         {
             joint.transform.position = position;
-            UpdateLinkage();
+            UpdateBars();
         }
     }
 
@@ -145,7 +145,7 @@ public class Linkage : MonoBehaviour
 
     public (HalfBar closestHalfBar, float closestDistance)? FindClosestHalfBar(Vector3 inputPosition)
     {
-        Edge3D[] edges = halfBars.Select(bar => new Edge3D("", bar.pivotJoint.transform.position, (bar.pivotJoint.transform.position + bar.oppositeJoint.transform.position) / 2)).ToArray();
+        Edge3D[] edges = halfBars.Select(bar => new Edge3D("", bar.pivotJoint.transform.position, (bar.pivotJoint.transform.position + bar.adjacentJoint.transform.position) / 2)).ToArray();
 
         // Check _EDGES_ for nearest point
         Vector3 nearestPointOnEdge = Vector3.zero;
@@ -321,9 +321,16 @@ public class Linkage : MonoBehaviour
         closestJoint = null;
     }
 
+    Vector3 pivotBeforeDrag = Vector3.zero;
+    Vector3 adjBeforeDrag = Vector3.zero;
+    Vector3 altBeforeDrag = Vector3.zero;
+    Vector3 oppBeforeDrag = Vector3.zero;
     public void OnBeginDragHalfBar(PointerEventData eventData)
     {
-
+        pivotBeforeDrag = closestHalfBar.pivotJoint.transform.position;
+        adjBeforeDrag = closestHalfBar.adjacentJoint.transform.position;
+        altBeforeDrag = closestHalfBar.alternativeAdjacentJoint.transform.position;
+        oppBeforeDrag = closestHalfBar.oppositeJoint.transform.position;
     }
 
     public void OnDragHalfBar(PointerEventData eventData)
@@ -337,10 +344,43 @@ public class Linkage : MonoBehaviour
             // Calculate the direction from the joint to the new mouse position
             Vector3 direction = (worldPoint - closestHalfBar.pivotJoint.transform.position).normalized;
 
-            // Maintain the distance between the joint and the opposite end
-            closestHalfBar.oppositeJoint.transform.position = closestHalfBar.pivotJoint.transform.position + direction * Vector3.Distance(closestHalfBar.pivotJoint.transform.position, closestHalfBar.oppositeJoint.transform.position);
+            float pivotToAdjDist = (adjBeforeDrag - pivotBeforeDrag).magnitude;
+            float adjToOppDist   = (oppBeforeDrag - adjBeforeDrag).magnitude;
+            float oppToAltDist   = (altBeforeDrag - oppBeforeDrag).magnitude;
+            float altToPivotDist = (pivotBeforeDrag - altBeforeDrag).magnitude;
 
-            UpdateLinkage();
+            float minDistViaPivot = Mathf.Abs(pivotToAdjDist - altToPivotDist);
+            float minDistViaOpp = Mathf.Abs(adjToOppDist - oppToAltDist);
+            float maxDistViaPivot = pivotToAdjDist + altToPivotDist;
+            float maxDistViaOpp = adjToOppDist + oppToAltDist;
+
+            Vector3 adjTarget = pivotBeforeDrag + direction * Vector3.Distance(pivotBeforeDrag, adjBeforeDrag);
+            Vector3 adjTargetToAlt = altBeforeDrag - adjTarget;
+            float adjTargetToAltDist = adjTargetToAlt.magnitude;
+
+            if (adjTargetToAltDist < minDistViaOpp)
+            {
+                adjTarget = adjBeforeDrag;
+                //Debug.Log(string.Format("{0} < {1}", adjTargetToAlt, minDistViaOpp));
+            }
+            else if (adjTargetToAltDist > maxDistViaOpp)
+            {
+                adjTarget = adjBeforeDrag;
+                //Debug.Log(string.Format("{0} > {1}", adjTargetToAlt, maxDistViaOpp));
+            }
+
+            float x = (adjTargetToAltDist * adjTargetToAltDist - oppToAltDist * oppToAltDist + adjToOppDist * adjToOppDist) / (2 * adjTargetToAltDist);
+            float y = Mathf.Sqrt(adjToOppDist * adjToOppDist - x*x);
+            Vector3 oppTarget_1 = adjTarget +
+                                  adjTargetToAlt.normalized * x
+                                  - new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
+            Vector3 oppTarget_2 = oppBeforeDrag;
+
+            // Maintain the distance between the joint and the opposite end
+            closestHalfBar.adjacentJoint.transform.position = adjTarget;
+            closestHalfBar.oppositeJoint.transform.position = oppTarget_1;
+
+            UpdateBars();
         }
     }
 
