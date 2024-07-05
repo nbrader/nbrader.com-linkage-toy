@@ -331,8 +331,10 @@ public class Linkage : MonoBehaviour
         adjBeforeDrag = closestHalfBar.adjacentJoint.transform.position;
         altBeforeDrag = closestHalfBar.alternativeAdjacentJoint.transform.position;
         oppBeforeDrag = closestHalfBar.oppositeJoint.transform.position;
+        lastOpp = oppBeforeDrag;
     }
 
+    Vector3 lastOpp = Vector3.zero;
     public void OnDragHalfBar(PointerEventData eventData)
     {
         if (closestHalfBar != null)
@@ -373,12 +375,25 @@ public class Linkage : MonoBehaviour
             float y = Mathf.Sqrt(adjToOppDist * adjToOppDist - x*x);
             Vector3 oppTarget_1 = adjTarget +
                                   adjTargetToAlt.normalized * x
+                                  + new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
+            Vector3 oppTarget_2 = adjTarget +
+                                  adjTargetToAlt.normalized * x
                                   - new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
-            Vector3 oppTarget_2 = oppBeforeDrag;
+
+            float oppTarget_1_distFromLast = (oppTarget_1 - lastOpp).magnitude;
+            float oppTarget_2_distFromLast = (oppTarget_2 - lastOpp).magnitude;
+
+            Vector3 newOpp = oppTarget_1;
+            if (oppTarget_2_distFromLast <= oppTarget_1_distFromLast)
+            {
+                newOpp = oppTarget_2;
+            }
+
+            lastOpp = newOpp;
 
             // Maintain the distance between the joint and the opposite end
             closestHalfBar.adjacentJoint.transform.position = adjTarget;
-            closestHalfBar.oppositeJoint.transform.position = oppTarget_1;
+            closestHalfBar.oppositeJoint.transform.position = newOpp;
 
             UpdateBars();
         }
