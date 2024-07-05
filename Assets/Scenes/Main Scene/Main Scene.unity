@@ -178,10 +178,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Joint 3
       objectReference: {fileID: 0}
-    - target: {fileID: 8535583110840138751, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}
 --- !u!4 &309920582 stripped
@@ -243,10 +239,6 @@ PrefabInstance:
     - target: {fileID: 5056121390876600673, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}
       propertyPath: m_Name
       value: Joint 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8535583110840138751, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}
@@ -439,10 +431,6 @@ PrefabInstance:
     - target: {fileID: 5056121390876600673, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}
       propertyPath: m_Name
       value: Joint 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8535583110840138751, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}
@@ -659,7 +647,6 @@ MonoBehaviour:
   - {fileID: 930215833}
   - {fileID: 1525290376}
   - {fileID: 887046751}
-  barPrefab: {fileID: 3839745485931276093, guid: 1942d05c46d388d4995d03cd53ce8590, type: 3}
   halfBarPrefab: {fileID: 3839745485931276093, guid: ce9a03662fb51d349a1f7a2a5850e197, type: 3}
 --- !u!4 &5187364662768440877 stripped
 Transform:
@@ -731,10 +718,6 @@ PrefabInstance:
     - target: {fileID: 5056121390876600673, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}
       propertyPath: m_Name
       value: Joint 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8535583110840138751, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 70998a793881dcb428d2c61b8d072bef, type: 3}

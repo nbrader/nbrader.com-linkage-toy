@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -914,6 +915,23 @@ public class Maths
         // the fact that leaning far left or right reverse direction is a logical consequence of this
         // as it's indistinguishable from leaning back/forward from the opposite direction.
         return Quaternion.LookRotation(Vector3.Cross(rightEarDirection, Vector3.up));
+    }
+
+    public static (bool IntersectionsExist, float IntersectionDistanceFromOriginAlongLineConnectingOrigins, float HalfSeparationOfIntersections) CircleCircleIntersectionXAndY(float distanceFromOriginOfCentreOfSecondCircle, float radiusOfSecondCircle, float radiusOfCircleAtOrigin)
+    {
+        float x = (distanceFromOriginOfCentreOfSecondCircle * distanceFromOriginOfCentreOfSecondCircle - radiusOfSecondCircle * radiusOfSecondCircle + radiusOfCircleAtOrigin * radiusOfCircleAtOrigin) / (2 * distanceFromOriginOfCentreOfSecondCircle);
+
+        float discrimanant = radiusOfCircleAtOrigin * radiusOfCircleAtOrigin - x * x;
+
+        if (discrimanant < 0)
+        {
+            return (IntersectionsExist: false, IntersectionDistanceFromOriginAlongLineConnectingOrigins: x, HalfSeparationOfIntersections: 0);
+        }
+        else
+        {
+            float y = Mathf.Sqrt(discrimanant);
+            return (IntersectionsExist: true, IntersectionDistanceFromOriginAlongLineConnectingOrigins: x, HalfSeparationOfIntersections: y);
+        }
     }
 }
 

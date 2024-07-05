@@ -358,25 +358,76 @@ public class Linkage : MonoBehaviour
                 //Debug.Log(string.Format("{0} > {1}", adjTargetToAlt, maxDistViaOpp));
             }
 
-            float x = (adjTargetToAltDist * adjTargetToAltDist - oppToAltDist * oppToAltDist + adjToOppDist * adjToOppDist) / (2 * adjTargetToAltDist);
-            float y = Mathf.Sqrt(adjToOppDist * adjToOppDist - x*x);
-            Vector3 oppTarget_1 = adjTarget +
-                                  adjTargetToAlt.normalized * x
-                                  + new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
-            Vector3 oppTarget_2 = adjTarget +
-                                  adjTargetToAlt.normalized * x
-                                  - new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
+            var intersectionData = Maths.CircleCircleIntersectionXAndY(adjTargetToAltDist, oppToAltDist, adjToOppDist);
+            bool solutionExists = intersectionData.IntersectionsExist;
 
-            float oppTarget_1_distFromLast = (oppTarget_1 - lastOpp).magnitude;
-            float oppTarget_2_distFromLast = (oppTarget_2 - lastOpp).magnitude;
-
-            Vector3 newOpp = oppTarget_1;
-            if (oppTarget_2_distFromLast <= oppTarget_1_distFromLast)
+            Vector3 newOpp = Vector3.zero;
+            float degreesCCWFromDownOfCentre1 = default;
+            float degreesBetweenExtremes1 = default;
+            bool showAngle1 = default;
+            float degreesCCWFromDownOfCentre2 = default;
+            float degreesBetweenExtremes2 = default;
+            bool showAngle2 = default;
+            if (!solutionExists)
             {
-                newOpp = oppTarget_2;
+                newOpp = lastOpp;
+
+                degreesCCWFromDownOfCentre1 = 0;
+                degreesBetweenExtremes1 = 0;
+                showAngle1 = false;
+                degreesCCWFromDownOfCentre2 = 0;
+                degreesBetweenExtremes2 = 0;
+                showAngle2 = false;
+            }
+            else
+            {
+                float x = intersectionData.IntersectionDistanceFromOriginAlongLineConnectingOrigins;
+                float y = intersectionData.HalfSeparationOfIntersections;
+                Vector3 oppTarget_1 = adjTarget +
+                                      adjTargetToAlt.normalized * x
+                                      + new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
+                Vector3 oppTarget_2 = adjTarget +
+                                      adjTargetToAlt.normalized * x
+                                      - new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
+
+                float oppTarget_1_distFromLast = (oppTarget_1 - lastOpp).magnitude;
+                float oppTarget_2_distFromLast = (oppTarget_2 - lastOpp).magnitude;
+
+                newOpp = oppTarget_1;
+                if (oppTarget_2_distFromLast <= oppTarget_1_distFromLast)
+                {
+                    newOpp = oppTarget_2;
+                }
+
+                var intersectionData1 = Maths.CircleCircleIntersectionXAndY(altToPivotDist,           oppToAltDist + adjToOppDist , pivotToAdjDist);
+                var intersectionData2 = Maths.CircleCircleIntersectionXAndY(altToPivotDist, Mathf.Abs(oppToAltDist - adjToOppDist), pivotToAdjDist);
+
+                showAngle1 = intersectionData1.IntersectionsExist;
+                showAngle2 = intersectionData2.IntersectionsExist;
+
+                degreesBetweenExtremes1 = 0;
+                degreesBetweenExtremes2 = 0;
+                if (showAngle1)
+                {
+                    var x1 = intersectionData1.IntersectionDistanceFromOriginAlongLineConnectingOrigins;
+                    var y1 = intersectionData1.HalfSeparationOfIntersections;
+                    degreesBetweenExtremes1 = 360f - Mathf.Rad2Deg * 2 * Mathf.Atan2(y1, x1);
+                }
+                if (showAngle2)
+                {
+                    var x2 = intersectionData2.IntersectionDistanceFromOriginAlongLineConnectingOrigins;
+                    var y2 = intersectionData2.HalfSeparationOfIntersections;
+                    degreesBetweenExtremes2 = Mathf.Rad2Deg * 2 * Mathf.Atan2(y2, x2);
+                }
+
+                Vector3 pivotToAlt = altBeforeDrag - pivotBeforeDrag;
+                degreesCCWFromDownOfCentre1 = Vector3.SignedAngle(-pivotToAlt, Vector3.down, Vector3.back);
+                degreesCCWFromDownOfCentre2 = Vector3.SignedAngle(pivotToAlt, Vector3.down, Vector3.back);
             }
 
             lastOpp = newOpp;
+
+            closestHalfBar.pivotJoint.SetAngleRanges(degreesCCWFromDownOfCentre1, degreesBetweenExtremes1, showAngle1, degreesCCWFromDownOfCentre2, degreesBetweenExtremes2, showAngle2);
 
             // Maintain the distance between the joint and the opposite end
             closestHalfBar.adjacentJoint.transform.position = adjTarget;
@@ -386,9 +437,20 @@ public class Linkage : MonoBehaviour
         }
     }
 
+    //public float ToFrac(float x)
+    //{
+    //    return (Sinh(x) + 1) / 2f;
+    //}
+
+    //public float Sinh(float x)
+    //{
+    //    return (Mathf.Exp(x) - Mathf.Exp(-x)) / 2f;
+    //}
+
     public void OnEndDragHalfBar(PointerEventData eventData)
     {
         // Optional: Handle end drag logic if needed
+        closestHalfBar.pivotJoint.SetAngleRanges(0f, 0f, false, 0f, 0f, false);
         closestHalfBar = null;
     }
 
