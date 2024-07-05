@@ -12,14 +12,12 @@ public enum LinkagePartType
 public class Linkage : MonoBehaviour
 {
     public List<Joint> joints;
-    public GameObject barPrefab;  // Prefab for a bar
     public GameObject halfBarPrefab;  // Prefab for a half bar
     readonly float barVisibleThickness = 0.1f;
     readonly float barColliderThicknessSize = 10f;
     readonly float jointColliderThickness = 0.5f; // In fact isn't the collider thickness but that's how it appears provided it's smaller than the true collider thickness.
     readonly float barColliderThickness = 0.5f;
 
-    private GameObject[] bars;
     private HalfBar[] halfBars;
 
     private Joint closestJoint;
@@ -40,17 +38,12 @@ public class Linkage : MonoBehaviour
             joint.parentLinkage = this;
         }
 
-        // Initialize bars and halfBars arrays
-        bars = new GameObject[joints.Count];
+        // Initialize halfBars arrays
         halfBars = new HalfBar[joints.Count * 2];
 
         // Create Bar objects
         for (int i = 0; i < joints.Count; i++)
         {
-            // Create full bar
-            GameObject barObj = Instantiate(barPrefab, transform);
-            bars[i] = barObj;
-
             // Create half bars
             GameObject halfBarObj1 = Instantiate(halfBarPrefab, transform);
             GameObject halfBarObj2 = Instantiate(halfBarPrefab, transform);
@@ -91,12 +84,6 @@ public class Linkage : MonoBehaviour
             // Calculate the position and scale for the full bar
             Vector3 direction = nextJoint.position - currentJoint.position;
             float distance = direction.magnitude;
-
-            // Update full bar position, rotation, and scale
-            bars[i].transform.position = currentJoint.position;
-            bars[i].transform.right = direction;
-            bars[i].transform.localScale = new Vector3(distance, barVisibleThickness, 1);
-            bars[i].GetComponent<BoxCollider2D>().size = new Vector2(1, barColliderThicknessSize);
 
             // Calculate and update half bar positions, rotations, and scales
             Vector3 nextDirection = (nextJoint.position - currentJoint.position) / 2;
