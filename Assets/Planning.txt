@@ -1,1 +1,3 @@
 There are bugs where nodes can go missing and I want to make breaking the constraints more explanatory than it is currently. Plus it just could be made pretties in general and could do with a way to translate and zoom.
+
+Made default linkage demonstrate two unconnected regions of angle for it's the rotational motion of the half bar going right from the top left joint. I would like to display the possible region as info for the user and as a step towards restricting motion to the part of it we're currently in, in steps which must not go through a discontinuity in the angular regions when taking the shortest route around the circle, where it instead gets stuck on that discontinuity until the cursor is moved to a place without this issue. 
