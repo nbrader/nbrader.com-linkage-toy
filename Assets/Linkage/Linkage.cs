@@ -24,6 +24,9 @@ public class Linkage : MonoBehaviour
     private HalfBar closestHalfBar;
     private LinkagePartType latestDraggedPartType = LinkagePartType.Joint;
     private bool isDragging = false; // Flag to indicate if dragging is in progress
+    private bool isCameraDragging = false; // Flag to indicate if camera dragging is in progress
+
+    private Vector3 lastMousePosition; // To store the last mouse position for camera dragging
 
     private void Awake()
     {
@@ -237,8 +240,33 @@ public class Linkage : MonoBehaviour
         {
             AdjustHalfBarLength(closestHalfBar, scrollInput);
         }
+        else if (Mathf.Abs(scrollInput) > 0.01f)
+        {
+            // Handle camera zooming
+            float scrollDelta = scrollInput;
+            Camera.main.orthographicSize -= scrollDelta;
+            Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 2f, 20f);
+        }
 
-        
+        // Handle camera dragging
+        if (Input.GetMouseButtonDown(0) && closestJoint == null && closestHalfBar == null)
+        {
+            isCameraDragging = true;
+            lastMousePosition = Input.mousePosition;
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            isCameraDragging = false;
+        }
+
+        if (isCameraDragging)
+        {
+            Vector3 delta = Camera.main.ScreenToWorldPoint(Input.mousePosition) - Camera.main.ScreenToWorldPoint(lastMousePosition);
+            Camera.main.transform.position -= delta;
+            lastMousePosition = Input.mousePosition;
+        }
+
         // Reset highlights
         foreach (Joint joint in joints)
         {
@@ -474,7 +502,7 @@ public class Linkage : MonoBehaviour
         oppBeforeDrag = closestHalfBar.oppositeJoint.transform.position;
         pivotToAdjDist = Vector3.Distance(pivotBeforeDrag, adjBeforeDrag);
         adjToOppDist = Vector3.Distance(adjBeforeDrag, oppBeforeDrag);
-        oppToAltDist = Vector3.Distance(oppBeforeDrag, altBeforeDrag);
+        oppToAltDist = Vector3.Distance(altBeforeDrag, oppBeforeDrag);
         altToPivotDist = Vector3.Distance(altBeforeDrag, pivotBeforeDrag);
     }
 
