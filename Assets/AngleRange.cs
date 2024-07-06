@@ -9,10 +9,12 @@ public class AngleRange : MonoBehaviour
     public Image image;
     public float degreesCCWFromDownOfCentre;
     public float degreesBetweenExtremes;
+    public bool isVisible;
 
     void Update()
     {
         transform.rotation = Quaternion.Euler(0, 0, degreesCCWFromDownOfCentre + degreesBetweenExtremes/2);
         image.fillAmount = degreesBetweenExtremes/360f;
+        image.enabled = isVisible;
     }
 }

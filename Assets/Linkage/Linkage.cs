@@ -193,6 +193,15 @@ public class Linkage : MonoBehaviour
         }
     }
 
+    // This update function could be made to calculate less often.
+    Vector3 pivotBeforeDrag = Vector3.zero;
+    Vector3 adjBeforeDrag = Vector3.zero;
+    Vector3 altBeforeDrag = Vector3.zero;
+    Vector3 oppBeforeDrag = Vector3.zero;
+    float pivotToAdjDist;
+    float adjToOppDist;
+    float oppToAltDist;
+    float altToPivotDist;
     private void Update()
     {
         if (isDragging) return;
@@ -226,13 +235,14 @@ public class Linkage : MonoBehaviour
         foreach (Joint joint in joints)
         {
             joint.Highlight(false);
+            joint.SetAngleRanges(0, 0, false, 0, 0, false);
         }
         foreach (HalfBar halfBar in halfBars)
         {
             halfBar.Highlight(false);
         }
 
-        // Set latest closes highlight
+        // Set latest closest highlight
         if (closestJoint != null)
         {
             closestJoint.Highlight(true);
@@ -241,6 +251,18 @@ public class Linkage : MonoBehaviour
         if (closestHalfBar != null)
         {
             closestHalfBar.Highlight(true);
+
+            pivotBeforeDrag = closestHalfBar.pivotJoint.transform.position;
+            adjBeforeDrag = closestHalfBar.adjacentJoint.transform.position;
+            altBeforeDrag = closestHalfBar.alternativeAdjacentJoint.transform.position;
+            oppBeforeDrag = closestHalfBar.oppositeJoint.transform.position;
+
+            // Calculate angle ranges to display to user
+            pivotToAdjDist = (adjBeforeDrag - pivotBeforeDrag).magnitude;
+            adjToOppDist = (oppBeforeDrag - adjBeforeDrag).magnitude;
+            oppToAltDist = (altBeforeDrag - oppBeforeDrag).magnitude;
+            altToPivotDist = (pivotBeforeDrag - altBeforeDrag).magnitude;
+            UpdateAngleRanges(altToPivotDist, oppToAltDist, adjToOppDist, pivotToAdjDist);
         }
     }
 
@@ -308,16 +330,8 @@ public class Linkage : MonoBehaviour
         closestJoint = null;
     }
 
-    Vector3 pivotBeforeDrag = Vector3.zero;
-    Vector3 adjBeforeDrag = Vector3.zero;
-    Vector3 altBeforeDrag = Vector3.zero;
-    Vector3 oppBeforeDrag = Vector3.zero;
     public void OnBeginDragHalfBar(PointerEventData eventData)
     {
-        pivotBeforeDrag = closestHalfBar.pivotJoint.transform.position;
-        adjBeforeDrag = closestHalfBar.adjacentJoint.transform.position;
-        altBeforeDrag = closestHalfBar.alternativeAdjacentJoint.transform.position;
-        oppBeforeDrag = closestHalfBar.oppositeJoint.transform.position;
         lastOpp = oppBeforeDrag;
     }
 
@@ -377,13 +391,6 @@ public class Linkage : MonoBehaviour
     {
         if (closestHalfBar != null)
         {
-            // Calculate angle ranges to display to user
-            float pivotToAdjDist = (adjBeforeDrag - pivotBeforeDrag).magnitude;
-            float adjToOppDist   = (oppBeforeDrag - adjBeforeDrag).magnitude;
-            float oppToAltDist   = (altBeforeDrag - oppBeforeDrag).magnitude;
-            float altToPivotDist = (pivotBeforeDrag - altBeforeDrag).magnitude;
-            UpdateAngleRanges(altToPivotDist, oppToAltDist, adjToOppDist, pivotToAdjDist);
-
             // Calculate new linkage position
             // First calculate possible positions for opposite joint
             float minDistViaOpp = Mathf.Abs(adjToOppDist - oppToAltDist);
