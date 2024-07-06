@@ -370,7 +370,7 @@ public class Linkage : MonoBehaviour
             bool showAngle2;
             if (!solutionExists)
             {
-                newOpp = lastOpp;
+                newOpp = oppBeforeDrag;
 
                 degreesCCWFromDownOfCentre1 = 0;
                 degreesBetweenExtremes1 = 0;
@@ -425,9 +425,9 @@ public class Linkage : MonoBehaviour
                 degreesCCWFromDownOfCentre2 = Vector3.SignedAngle(pivotToAlt, Vector3.down, Vector3.back);
             }
 
-            lastOpp = newOpp;
-
             closestHalfBar.pivotJoint.SetAngleRanges(degreesCCWFromDownOfCentre1, degreesBetweenExtremes1, showAngle1, degreesCCWFromDownOfCentre2, degreesBetweenExtremes2, showAngle2);
+
+            lastOpp = newOpp;
 
             // Maintain the distance between the joint and the opposite end
             closestHalfBar.adjacentJoint.transform.position = adjTarget;
