@@ -437,16 +437,6 @@ public class Linkage : MonoBehaviour
         }
     }
 
-    //public float ToFrac(float x)
-    //{
-    //    return (Sinh(x) + 1) / 2f;
-    //}
-
-    //public float Sinh(float x)
-    //{
-    //    return (Mathf.Exp(x) - Mathf.Exp(-x)) / 2f;
-    //}
-
     public void OnEndDragHalfBar(PointerEventData eventData)
     {
         // Optional: Handle end drag logic if needed

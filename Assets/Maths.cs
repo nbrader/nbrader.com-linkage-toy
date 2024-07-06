@@ -933,6 +933,21 @@ public class Maths
             return (IntersectionsExist: true, IntersectionDistanceFromOriginAlongLineConnectingOrigins: x, HalfSeparationOfIntersections: y);
         }
     }
+
+    /// <summary>
+    /// Maps the full range of floats to fractions of unity (using sinh).
+    /// </summary>
+    /// <param name="x"></param>
+    /// <returns></returns>
+    public float ToFrac(float x)
+    {
+        return (Sinh(x) + 1) / 2f;
+    }
+
+    public float Sinh(float x)
+    {
+        return (Mathf.Exp(x) - Mathf.Exp(-x)) / 2f;
+    }
 }
 
 class Bits
