@@ -377,29 +377,27 @@ public class Linkage : MonoBehaviour
     {
         if (closestHalfBar != null)
         {
-            // Convert screen position to world position
-            Vector3 worldPoint = ScreenToWorldPoint(eventData.position);
-            worldPoint.z = 0; // Ensure the joint stays on the z = 0 plane
-
-            // Calculate the direction from the joint to the new mouse position
-            Vector3 direction = (worldPoint - closestHalfBar.pivotJoint.transform.position).normalized;
-
+            // Calculate angle ranges to display to user
             float pivotToAdjDist = (adjBeforeDrag - pivotBeforeDrag).magnitude;
             float adjToOppDist   = (oppBeforeDrag - adjBeforeDrag).magnitude;
             float oppToAltDist   = (altBeforeDrag - oppBeforeDrag).magnitude;
             float altToPivotDist = (pivotBeforeDrag - altBeforeDrag).magnitude;
+            UpdateAngleRanges(altToPivotDist, oppToAltDist, adjToOppDist, pivotToAdjDist);
 
+            // Calculate new linkage position
+            // First calculate possible positions for opposite joint
             float minDistViaOpp = Mathf.Abs(adjToOppDist - oppToAltDist);
             float maxDistViaOpp = adjToOppDist + oppToAltDist;
-
+            Vector3 worldPoint = ScreenToWorldPoint(eventData.position);
+            worldPoint.z = 0; // Ensure the joint stays on the z = 0 plane
+            Vector3 direction = (worldPoint - closestHalfBar.pivotJoint.transform.position).normalized;
             Vector3 adjTarget = pivotBeforeDrag + direction * Vector3.Distance(pivotBeforeDrag, adjBeforeDrag);
             Vector3 adjTargetToAlt = altBeforeDrag - adjTarget;
             float adjTargetToAltDist = adjTargetToAlt.magnitude;
-
             var (solutionsExist, oppTarget_1, oppTarget_2) = GetPossibleOppPositions(adjTargetToAltDist, minDistViaOpp, maxDistViaOpp, oppToAltDist, adjToOppDist, adjTarget, adjTargetToAlt);
 
-            UpdateAngleRanges(altToPivotDist, oppToAltDist, adjToOppDist, pivotToAdjDist);
-
+            // If solutions don't exist then show linkage before dragging
+            // If solutions do exist, pick one closest to previously calculated for continuity of motion
             Vector3 newOpp;
             if (!solutionsExist)
             {
@@ -417,13 +415,9 @@ public class Linkage : MonoBehaviour
                     newOpp = oppTarget_2;
                 }
             }
-
             lastOpp = newOpp;
-
-            // Maintain the distance between the joint and the opposite end
             closestHalfBar.adjacentJoint.transform.position = adjTarget;
             closestHalfBar.oppositeJoint.transform.position = newOpp;
-
             UpdateBars();
         }
     }
