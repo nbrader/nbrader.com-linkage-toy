@@ -230,6 +230,14 @@ public class Linkage : MonoBehaviour
                 closestHalfBar = null;
             }
         }
+
+        // Handle mouse wheel input to extend or contract the hovered half bar
+        float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+        if (closestHalfBar != null && Mathf.Abs(scrollInput) > 0.01f)
+        {
+            AdjustHalfBarLength(closestHalfBar, scrollInput);
+        }
+
         
         // Reset highlights
         foreach (Joint joint in joints)
@@ -443,5 +451,43 @@ public class Linkage : MonoBehaviour
     {
         Vector3 screenPoint = new Vector3(screenPosition.x, screenPosition.y, -Camera.main.transform.position.z);
         return Camera.main.ScreenToWorldPoint(screenPoint);
+    }
+
+    private void AdjustHalfBarLength(HalfBar halfBar, float scrollAmount)
+    {
+        float lengthChange = scrollAmount * 0.1f; // Adjust the 0.1f to control the rate of length change
+        Vector3 direction = (halfBar.adjacentJoint.transform.position - halfBar.pivotJoint.transform.position).normalized;
+        halfBar.adjacentJoint.transform.position += direction * lengthChange;
+
+        // Update all bars after changing the length
+        UpdateBars();
+    }
+
+    public void StartDragging(LinkagePartType partType)
+    {
+        latestDraggedPartType = partType;
+        isDragging = true;
+
+        pivotBeforeDrag = closestHalfBar.pivotJoint.transform.position;
+        adjBeforeDrag = closestHalfBar.adjacentJoint.transform.position;
+        altBeforeDrag = closestHalfBar.alternativeAdjacentJoint.transform.position;
+        oppBeforeDrag = closestHalfBar.oppositeJoint.transform.position;
+        pivotToAdjDist = Vector3.Distance(pivotBeforeDrag, adjBeforeDrag);
+        adjToOppDist = Vector3.Distance(adjBeforeDrag, oppBeforeDrag);
+        oppToAltDist = Vector3.Distance(oppBeforeDrag, altBeforeDrag);
+        altToPivotDist = Vector3.Distance(altBeforeDrag, pivotBeforeDrag);
+    }
+
+    public void StopDragging()
+    {
+        isDragging = false;
+    }
+
+    public void RestoreJointsToBeforeDrag()
+    {
+        closestHalfBar.pivotJoint.transform.position = pivotBeforeDrag;
+        closestHalfBar.adjacentJoint.transform.position = adjBeforeDrag;
+        closestHalfBar.alternativeAdjacentJoint.transform.position = altBeforeDrag;
+        closestHalfBar.oppositeJoint.transform.position = oppBeforeDrag;
     }
 }

@@ -1,3 +1,2 @@
 Make dragging from anywhere off linkage cause translate and zoom of camera.
-Make scrolling with mouse wheel extend or contract currently hovered half bar.
 Classify the types of 4 bar linkage by behaviour, detect and display which the current one is.
