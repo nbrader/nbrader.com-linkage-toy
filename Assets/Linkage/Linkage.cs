@@ -386,6 +386,7 @@ public class Linkage : MonoBehaviour
         closestHalfBar.pivotJoint.SetAngleRanges(degreesCCWFromDownOfCentre1, degreesBetweenExtremes1, showAngle1, degreesCCWFromDownOfCentre2, degreesBetweenExtremes2, showAngle2);
     }
 
+    Vector3 lastAdj = Vector3.zero;
     Vector3 lastOpp = Vector3.zero;
     public void OnDragHalfBar(PointerEventData eventData)
     {
@@ -403,66 +404,13 @@ public class Linkage : MonoBehaviour
             float adjTargetToAltDist = adjTargetToAlt.magnitude;
             var (solutionsExist, oppTarget_1, oppTarget_2) = GetPossibleOppPositions(adjTargetToAltDist, minDistViaOpp, maxDistViaOpp, oppToAltDist, adjToOppDist, adjTarget, adjTargetToAlt);
 
-            //// If solutions don't exist then show linkage before dragging
-            //// If solutions do exist, pick one closest to previously calculated for continuity of motion
-            //Vector3 newOpp;
-            //if (!solutionsExist)
-            //{
-            //    pivotBeforeDrag = closestHalfBar.pivotJoint.transform.position;
-            //    adjBeforeDrag = closestHalfBar.adjacentJoint.transform.position;
-            //    altBeforeDrag = closestHalfBar.alternativeAdjacentJoint.transform.position;
-            //    oppBeforeDrag = closestHalfBar.oppositeJoint.transform.position;
-
-            //    // Calculate angle ranges to display to user
-            //    pivotToAdjDist = (adjBeforeDrag - pivotBeforeDrag).magnitude;
-            //    adjToOppDist = (oppBeforeDrag - adjBeforeDrag).magnitude;
-            //    oppToAltDist = (altBeforeDrag - oppBeforeDrag).magnitude;
-            //    altToPivotDist = (pivotBeforeDrag - altBeforeDrag).magnitude;
-
-            //    List<Vector3> adjTargetOptions = new();
-            //    if (closestHalfBar.pivotJoint.angleRange1.isVisible)
-            //    {
-            //        float angle1 = (closestHalfBar.pivotJoint.angleRange1.degreesCCWFromDownOfCentre + closestHalfBar.pivotJoint.angleRange1.degreesBetweenExtremes / 2 - 90) * Mathf.Deg2Rad;
-            //        Vector3 adjPos1 = pivotBeforeDrag + pivotToAdjDist * new Vector3(Mathf.Cos(angle1), Mathf.Sin(angle1), 0);
-            //        float angle2 = (closestHalfBar.pivotJoint.angleRange1.degreesCCWFromDownOfCentre - closestHalfBar.pivotJoint.angleRange1.degreesBetweenExtremes / 2 - 90) * Mathf.Deg2Rad;
-            //        Vector3 adjPos2 = pivotBeforeDrag + pivotToAdjDist * new Vector3(Mathf.Cos(angle2), Mathf.Sin(angle2), 0);
-            //        adjTargetOptions.Add(adjPos1);
-            //        adjTargetOptions.Add(adjPos2);
-            //    }
-            //    if (closestHalfBar.pivotJoint.angleRange2.isVisible)
-            //    {
-            //        float angle1 = (closestHalfBar.pivotJoint.angleRange2.degreesCCWFromDownOfCentre + closestHalfBar.pivotJoint.angleRange2.degreesBetweenExtremes / 2 - 90) * Mathf.Deg2Rad;
-            //        Vector3 adjPos1 = pivotBeforeDrag + pivotToAdjDist * new Vector3(Mathf.Cos(angle1), Mathf.Sin(angle1), 0);
-            //        float angle2 = (closestHalfBar.pivotJoint.angleRange2.degreesCCWFromDownOfCentre - closestHalfBar.pivotJoint.angleRange2.degreesBetweenExtremes / 2 - 90) * Mathf.Deg2Rad;
-            //        Vector3 adjPos2 = pivotBeforeDrag + pivotToAdjDist * new Vector3(Mathf.Cos(angle2), Mathf.Sin(angle2), 0);
-            //        adjTargetOptions.Add(adjPos1);
-            //        adjTargetOptions.Add(adjPos2);
-            //    }
-
-            //    adjTarget = adjTargetOptions.OrderBy(adjPos => (adjPos - adjTarget).magnitude).First();
-            //    adjTargetToAlt = altBeforeDrag - adjTarget;
-            //    adjTargetToAltDist = adjTargetToAlt.magnitude;
-            //    (solutionsExist, oppTarget_1, oppTarget_2) = GetPossibleOppPositions(adjTargetToAltDist, minDistViaOpp, maxDistViaOpp, oppToAltDist, adjToOppDist, adjTarget, adjTargetToAlt);
-            //}
-
-            //float oppTarget_1_distFromLast = (oppTarget_1 - lastOpp).magnitude;
-            //float oppTarget_2_distFromLast = (oppTarget_2 - lastOpp).magnitude;
-            //if (oppTarget_2_distFromLast <= oppTarget_1_distFromLast)
-            //{
-            //    newOpp = oppTarget_2;
-            //}
-            //else
-            //{
-            //    newOpp = oppTarget_1;
-            //}
-
             // If solutions don't exist then show linkage before dragging
             // If solutions do exist, pick one closest to previously calculated for continuity of motion
             Vector3 newOpp;
             if (!solutionsExist)
             {
-                adjTarget = adjBeforeDrag;
-                newOpp = oppBeforeDrag;
+                adjTarget = lastAdj;
+                newOpp = lastOpp;
             }
             else
             {
@@ -475,6 +423,8 @@ public class Linkage : MonoBehaviour
                     newOpp = oppTarget_2;
                 }
             }
+
+            lastAdj = adjTarget;
             lastOpp = newOpp;
             closestHalfBar.adjacentJoint.transform.position = adjTarget;
             closestHalfBar.oppositeJoint.transform.position = newOpp;
