@@ -361,13 +361,13 @@ public class Linkage : MonoBehaviour
             var intersectionData = Maths.CircleCircleIntersectionXAndY(adjTargetToAltDist, oppToAltDist, adjToOppDist);
             bool solutionExists = intersectionData.IntersectionsExist;
 
-            Vector3 newOpp = Vector3.zero;
-            float degreesCCWFromDownOfCentre1 = default;
-            float degreesBetweenExtremes1 = default;
-            bool showAngle1 = default;
-            float degreesCCWFromDownOfCentre2 = default;
-            float degreesBetweenExtremes2 = default;
-            bool showAngle2 = default;
+            Vector3 newOpp;
+            float degreesCCWFromDownOfCentre1;
+            float degreesBetweenExtremes1;
+            bool showAngle1;
+            float degreesCCWFromDownOfCentre2;
+            float degreesBetweenExtremes2;
+            bool showAngle2;
             if (!solutionExists)
             {
                 newOpp = lastOpp;
