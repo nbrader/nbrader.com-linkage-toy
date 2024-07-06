@@ -321,6 +321,57 @@ public class Linkage : MonoBehaviour
         lastOpp = oppBeforeDrag;
     }
 
+    public (bool solutionsExist, Vector3 oppPosition1, Vector3 oppPosition2) GetPossibleOppPositions(float adjTargetToAltDist, float minDistViaOpp, float maxDistViaOpp, float oppToAltDist, float adjToOppDist, Vector3 adjTarget, Vector3 adjTargetToAlt)
+    {
+        bool solutionsExist = adjTargetToAltDist >= minDistViaOpp && adjTargetToAltDist <= maxDistViaOpp;
+
+        Vector3 oppTarget_1 = Vector3.zero;
+        Vector3 oppTarget_2 = Vector3.zero;
+        if (solutionsExist)
+        {
+            var intersectionData = Maths.CircleCircleIntersectionXAndY(adjTargetToAltDist, oppToAltDist, adjToOppDist);
+
+            float x = intersectionData.IntersectionDistanceFromOriginAlongLineConnectingOrigins;
+            float y = intersectionData.HalfSeparationOfIntersections;
+            oppTarget_1 = adjTarget
+                          + adjTargetToAlt.normalized * x
+                          + new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
+            oppTarget_2 = adjTarget
+                          + adjTargetToAlt.normalized * x
+                          - new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
+        }
+
+        return (solutionsExist : solutionsExist, oppPosition1 : oppTarget_1, oppPosition2 : oppTarget_2);
+    }
+
+    public void UpdateAngleRanges(float altToPivotDist, float oppToAltDist, float adjToOppDist, float pivotToAdjDist)
+    {
+        var intersectionData1 = Maths.CircleCircleIntersectionXAndY(altToPivotDist, oppToAltDist + adjToOppDist, pivotToAdjDist);
+        var intersectionData2 = Maths.CircleCircleIntersectionXAndY(altToPivotDist, Mathf.Abs(oppToAltDist - adjToOppDist), pivotToAdjDist);
+
+        bool showAngle1 = intersectionData1.IntersectionsExist;
+        bool showAngle2 = intersectionData2.IntersectionsExist;
+        float degreesBetweenExtremes1 = 0;
+        float degreesBetweenExtremes2 = 0;
+        if (showAngle1)
+        {
+            var x1 = intersectionData1.IntersectionDistanceFromOriginAlongLineConnectingOrigins;
+            var y1 = intersectionData1.HalfSeparationOfIntersections;
+            degreesBetweenExtremes1 = 360f - Mathf.Rad2Deg * 2 * Mathf.Atan2(y1, x1);
+        }
+        if (showAngle2)
+        {
+            var x2 = intersectionData2.IntersectionDistanceFromOriginAlongLineConnectingOrigins;
+            var y2 = intersectionData2.HalfSeparationOfIntersections;
+            degreesBetweenExtremes2 = Mathf.Rad2Deg * 2 * Mathf.Atan2(y2, x2);
+        }
+
+        Vector3 pivotToAlt = altBeforeDrag - pivotBeforeDrag;
+        float degreesCCWFromDownOfCentre1 = Vector3.SignedAngle(-pivotToAlt, Vector3.down, Vector3.back);
+        float degreesCCWFromDownOfCentre2 = Vector3.SignedAngle(pivotToAlt, Vector3.down, Vector3.back);
+        closestHalfBar.pivotJoint.SetAngleRanges(degreesCCWFromDownOfCentre1, degreesBetweenExtremes1, showAngle1, degreesCCWFromDownOfCentre2, degreesBetweenExtremes2, showAngle2);
+    }
+
     Vector3 lastOpp = Vector3.zero;
     public void OnDragHalfBar(PointerEventData eventData)
     {
@@ -338,94 +389,34 @@ public class Linkage : MonoBehaviour
             float oppToAltDist   = (altBeforeDrag - oppBeforeDrag).magnitude;
             float altToPivotDist = (pivotBeforeDrag - altBeforeDrag).magnitude;
 
-            float minDistViaPivot = Mathf.Abs(pivotToAdjDist - altToPivotDist);
             float minDistViaOpp = Mathf.Abs(adjToOppDist - oppToAltDist);
-            float maxDistViaPivot = pivotToAdjDist + altToPivotDist;
             float maxDistViaOpp = adjToOppDist + oppToAltDist;
 
             Vector3 adjTarget = pivotBeforeDrag + direction * Vector3.Distance(pivotBeforeDrag, adjBeforeDrag);
             Vector3 adjTargetToAlt = altBeforeDrag - adjTarget;
             float adjTargetToAltDist = adjTargetToAlt.magnitude;
 
-            if (adjTargetToAltDist < minDistViaOpp)
-            {
-                adjTarget = adjBeforeDrag;
-                //Debug.Log(string.Format("{0} < {1}", adjTargetToAlt, minDistViaOpp));
-            }
-            else if (adjTargetToAltDist > maxDistViaOpp)
-            {
-                adjTarget = adjBeforeDrag;
-                //Debug.Log(string.Format("{0} > {1}", adjTargetToAlt, maxDistViaOpp));
-            }
+            var (solutionsExist, oppTarget_1, oppTarget_2) = GetPossibleOppPositions(adjTargetToAltDist, minDistViaOpp, maxDistViaOpp, oppToAltDist, adjToOppDist, adjTarget, adjTargetToAlt);
 
-            var intersectionData = Maths.CircleCircleIntersectionXAndY(adjTargetToAltDist, oppToAltDist, adjToOppDist);
-            bool solutionExists = intersectionData.IntersectionsExist;
+            UpdateAngleRanges(altToPivotDist, oppToAltDist, adjToOppDist, pivotToAdjDist);
 
             Vector3 newOpp;
-            float degreesCCWFromDownOfCentre1;
-            float degreesBetweenExtremes1;
-            bool showAngle1;
-            float degreesCCWFromDownOfCentre2;
-            float degreesBetweenExtremes2;
-            bool showAngle2;
-            if (!solutionExists)
+            if (!solutionsExist)
             {
+                adjTarget = adjBeforeDrag;
                 newOpp = oppBeforeDrag;
-
-                degreesCCWFromDownOfCentre1 = 0;
-                degreesBetweenExtremes1 = 0;
-                showAngle1 = false;
-                degreesCCWFromDownOfCentre2 = 0;
-                degreesBetweenExtremes2 = 0;
-                showAngle2 = false;
             }
             else
             {
-                float x = intersectionData.IntersectionDistanceFromOriginAlongLineConnectingOrigins;
-                float y = intersectionData.HalfSeparationOfIntersections;
-                Vector3 oppTarget_1 = adjTarget +
-                                      adjTargetToAlt.normalized * x
-                                      + new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
-                Vector3 oppTarget_2 = adjTarget +
-                                      adjTargetToAlt.normalized * x
-                                      - new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
+                newOpp = oppTarget_1;
 
                 float oppTarget_1_distFromLast = (oppTarget_1 - lastOpp).magnitude;
                 float oppTarget_2_distFromLast = (oppTarget_2 - lastOpp).magnitude;
-
-                newOpp = oppTarget_1;
                 if (oppTarget_2_distFromLast <= oppTarget_1_distFromLast)
                 {
                     newOpp = oppTarget_2;
                 }
-
-                var intersectionData1 = Maths.CircleCircleIntersectionXAndY(altToPivotDist,           oppToAltDist + adjToOppDist , pivotToAdjDist);
-                var intersectionData2 = Maths.CircleCircleIntersectionXAndY(altToPivotDist, Mathf.Abs(oppToAltDist - adjToOppDist), pivotToAdjDist);
-
-                showAngle1 = intersectionData1.IntersectionsExist;
-                showAngle2 = intersectionData2.IntersectionsExist;
-
-                degreesBetweenExtremes1 = 0;
-                degreesBetweenExtremes2 = 0;
-                if (showAngle1)
-                {
-                    var x1 = intersectionData1.IntersectionDistanceFromOriginAlongLineConnectingOrigins;
-                    var y1 = intersectionData1.HalfSeparationOfIntersections;
-                    degreesBetweenExtremes1 = 360f - Mathf.Rad2Deg * 2 * Mathf.Atan2(y1, x1);
-                }
-                if (showAngle2)
-                {
-                    var x2 = intersectionData2.IntersectionDistanceFromOriginAlongLineConnectingOrigins;
-                    var y2 = intersectionData2.HalfSeparationOfIntersections;
-                    degreesBetweenExtremes2 = Mathf.Rad2Deg * 2 * Mathf.Atan2(y2, x2);
-                }
-
-                Vector3 pivotToAlt = altBeforeDrag - pivotBeforeDrag;
-                degreesCCWFromDownOfCentre1 = Vector3.SignedAngle(-pivotToAlt, Vector3.down, Vector3.back);
-                degreesCCWFromDownOfCentre2 = Vector3.SignedAngle(pivotToAlt, Vector3.down, Vector3.back);
             }
-
-            closestHalfBar.pivotJoint.SetAngleRanges(degreesCCWFromDownOfCentre1, degreesBetweenExtremes1, showAngle1, degreesCCWFromDownOfCentre2, degreesBetweenExtremes2, showAngle2);
 
             lastOpp = newOpp;
 
