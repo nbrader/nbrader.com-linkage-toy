@@ -3,6 +3,7 @@ Classify the types of 4 bar linkage by behaviour, detect and display which the c
 Make holding right click on a half bar show both solutions.
 Make releasing right click from a half bar select the solution with the opposite joint nearest the cursor.
 Make the instructions resize well to be readable but not too big on many typical resolutions of desktop browser as well as mobile phones with either orientation and either full-screen state.
+Make the radius on selecting a joint/bar scale with the camera zoom so that we can do detail work by zooming in.
 
 Bigger job:
     Make a system for building bigger mechanisms out of 4-bar linkages:
