@@ -1,4 +1,12 @@
 Classify the types of 4 bar linkage by behaviour, detect and display which the current one is.
+    - Try classifying by how many discontinuities exist in angle solutions over all joints
 Make holding right click on a half bar show both solutions.
 Make releasing right click from a half bar select the solution with the opposite joint nearest the cursor.
 Make the instructions resize well to be readable but not too big on many typical resolutions of desktop browser as well as mobile phones with either orientation and either full-screen state.
+
+Bigger job:
+    Make a system for building bigger mechanisms out of 4-bar linkages:
+        - I could have something similar to what I have but instead of clicking and dragging from a half-bar I could make every linkage have a designated "driven half-bar" which by default will following the cursor when pressed but can also be associated with a joint to follow instead.
+        - I could similarly have a designated "fixed bar" which is fixed to the background if not associated to another bar or fixed to another bar if it is associated to another bar.
+        - It would then by more interesting to use trail renderers on nodes to see what shapes they trace out
+        - Make it into a game: I could make the machines be required to solve puzzles like completing the task of touching some things while not touching others.
