@@ -15,8 +15,8 @@ public class Linkage : MonoBehaviour
     public GameObject halfBarPrefab;  // Prefab for a half bar
     readonly float barVisibleThickness = 0.1f;
     readonly float barColliderThicknessSize = 10f;
-    readonly float jointColliderThickness = 0.5f; // In fact isn't the collider thickness but that's how it appears provided it's smaller than the true collider thickness.
-    readonly float barColliderThickness = 0.5f;
+    readonly float baseJointColliderThickness = 0.1f; // Base collider thickness for joints
+    readonly float baseBarColliderThickness = 0.1f; // Base collider thickness for bars
 
     private HalfBar[] halfBars;
 
@@ -28,6 +28,8 @@ public class Linkage : MonoBehaviour
 
     private Vector3 lastMousePosition; // To store the last mouse position for camera dragging
 
+    float jointColliderThickness; // In fact isn't the collider thickness but that's how it appears provided it's smaller than the true collider thickness.
+    float barColliderThickness;
     private void Awake()
     {
         if (joints == null || joints.Count != 4)
@@ -70,6 +72,7 @@ public class Linkage : MonoBehaviour
         }
 
         UpdateBars();
+        UpdateSelectionRadius();
     }
 
     public void UpdateBars()
@@ -205,6 +208,8 @@ public class Linkage : MonoBehaviour
     float adjToOppDist;
     float oppToAltDist;
     float altToPivotDist;
+
+    float scrollAmount = 0f;
     private void Update()
     {
         if (isDragging) return;
@@ -244,8 +249,10 @@ public class Linkage : MonoBehaviour
         {
             // Handle camera zooming
             float scrollDelta = scrollInput;
-            Camera.main.orthographicSize -= scrollDelta;
-            Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, 2f, 20f);
+            scrollAmount -= scrollDelta;
+            scrollAmount = Mathf.Clamp(scrollAmount, -5f, 5f);
+            Camera.main.orthographicSize = Mathf.Pow(5, 1+scrollAmount/5f);
+            Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, -50f, 50f);
         }
 
         // Handle camera dragging
@@ -392,7 +399,7 @@ public class Linkage : MonoBehaviour
                           - new Vector3(-adjTargetToAlt.normalized.y, adjTargetToAlt.normalized.x, 0f) * y;
         }
 
-        return (solutionsExist : solutionsExist, oppPosition1 : oppTarget_1, oppPosition2 : oppTarget_2);
+        return (solutionsExist: solutionsExist, oppPosition1: oppTarget_1, oppPosition2: oppTarget_2);
     }
 
     public void UpdateAngleRanges(float altToPivotDist, float oppToAltDist, float adjToOppDist, float pivotToAdjDist)
@@ -518,5 +525,12 @@ public class Linkage : MonoBehaviour
         closestHalfBar.adjacentJoint.transform.position = adjBeforeDrag;
         closestHalfBar.alternativeAdjacentJoint.transform.position = altBeforeDrag;
         closestHalfBar.oppositeJoint.transform.position = oppBeforeDrag;
+    }
+
+    private void UpdateSelectionRadius()
+    {
+        float zoomFactor = Camera.main.orthographicSize;
+        jointColliderThickness = baseJointColliderThickness * zoomFactor;
+        barColliderThickness = baseBarColliderThickness * zoomFactor;
     }
 }
