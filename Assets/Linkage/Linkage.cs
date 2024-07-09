@@ -368,6 +368,7 @@ public class Linkage : MonoBehaviour
 
     public void OnBeginDragHalfBar(PointerEventData eventData)
     {
+        lastAdj = adjBeforeDrag;
         lastOpp = oppBeforeDrag;
     }
 

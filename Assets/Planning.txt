@@ -1,6 +1,3 @@
-Bugs:
-    A joint can jump to the same location as another if the bar you select is already at it's angular limit.
-
 Enhancements:
     Classify the types of 4 bar linkage by behaviour, detect and display which the current one is.
         - Try classifying by how many discontinuities exist in angle solutions over all joints
