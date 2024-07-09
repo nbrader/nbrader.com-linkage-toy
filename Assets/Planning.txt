@@ -1,7 +1,7 @@
 Enhancements:
     Classify the types of 4 bar linkage by behaviour, detect and display which the current one is.
         - Try classifying by how many discontinuities exist in angle solutions over all joints
-    Make holding right click on a half bar show both solutions.
+    Make holding right click on a half bar show both solutions. Ideally make this allow both buttons to be held so you can see both solutions in action at once.
     Make releasing right click from a half bar select the solution with the opposite joint nearest the cursor.
 
     Bigger job:
