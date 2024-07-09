@@ -3,7 +3,6 @@ Enhancements:
         - Try classifying by how many discontinuities exist in angle solutions over all joints
     Make holding right click on a half bar show both solutions.
     Make releasing right click from a half bar select the solution with the opposite joint nearest the cursor.
-    Make the instructions resize well to be readable but not too big on many typical resolutions of desktop browser as well as mobile phones with either orientation and either full-screen state.
 
     Bigger job:
         Make a system for building bigger mechanisms out of 4-bar linkages:
