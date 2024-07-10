@@ -10,9 +10,9 @@ public enum LinkagePartType
 }
 
 /// <summary>
-/// There is at most 1 joint out of a pair of opposing joints has angle which would break the constraint
-/// of being less than min distance imposed by the opposing bars and similarly for being more than max
-/// distance imposed by the opposing bars.
+/// There is at most 1 joint out of a pair of opposing joints which has angle which would break the
+/// constraint of being less than min distance imposed by the opposing bars and similarly for being
+/// more than max distance imposed by the opposing bars.
 /// 
 /// For one, a pair of adjacent bars has a sum of lengths either less than, equal to or more than that
 /// of the opposing pair of bars and in each of those cases the opposing bars therefore have a sum of
