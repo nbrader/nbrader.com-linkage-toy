@@ -9,7 +9,7 @@ public class Joint : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
     public AngleRange angleRange1;
     public AngleRange angleRange2;
 
-    public void SetAngleRanges(float degreesCCWFromDownOfCentre1, float degreesBetweenExtremes1, bool showAngle1, float degreesCCWFromDownOfCentre2, float degreesBetweenExtremes2, bool showAngle2)
+    public void SetAngleRanges(float degreesCCWFromDownOfCentre1, float degreesBetweenExtremes1, bool showAngle1, Color color1, float degreesCCWFromDownOfCentre2, float degreesBetweenExtremes2, bool showAngle2, Color color2)
     {
         angleRange1.isVisible = showAngle1;
         angleRange2.isVisible = showAngle2;
@@ -17,6 +17,8 @@ public class Joint : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         angleRange1.degreesBetweenExtremes = degreesBetweenExtremes1;
         angleRange2.degreesCCWFromDownOfCentre = degreesCCWFromDownOfCentre2;
         angleRange2.degreesBetweenExtremes = degreesBetweenExtremes2;
+        angleRange1.color = color1;
+        angleRange2.color = color2;
     }
 
     public void OnBeginDrag(PointerEventData eventData)

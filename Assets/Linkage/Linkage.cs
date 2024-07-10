@@ -9,6 +9,26 @@ public enum LinkagePartType
     HalfBar,
 }
 
+/// <summary>
+/// There is at most 1 joint out of a pair of opposing joints has angle which would break the constraint
+/// of being less than min distance imposed by the opposing bars and similarly for being more than max
+/// distance imposed by the opposing bars.
+/// 
+/// For one, a pair of adjacent bars has a sum of lengths either less than, equal to or more than that
+/// of the opposing pair of bars and in each of those cases the opposing bars therefore have a sum of
+/// lengths that is more than, equal to or less than the first pair respectively.
+/// 
+/// Also, when an adjacent pair of bars are at a limit of an angular range, this can only
+/// be because the other pair have reached a minim or maximum, which occur when they are collinear.
+/// The fact that they've reached a collinear positioned demonstrates that they didn't themselves have an
+/// angular restriction there and may pass through continuously the other half of their angular range.
+/// 
+/// Conversely, any joint which allows a collinear angle is hitting a minimum or maximum distance of
+/// endpoints and so if the opposing joint isn't also hitting a collinear angle when the first joint
+/// does, then it won't for any angle because other angles can only result in less extreme distances
+/// of endpoints and therefore there will be a (possibly zero) range of no solutions for the other
+/// joint beyond the angle it reached at that extreme.
+/// </summary>
 public class Linkage : MonoBehaviour
 {
     public List<Joint> joints;
@@ -278,7 +298,7 @@ public class Linkage : MonoBehaviour
         foreach (Joint joint in joints)
         {
             joint.Highlight(false);
-            joint.SetAngleRanges(0, 0, false, 0, 0, false);
+            joint.SetAngleRanges(0, 0, false, Color.red, 0, 0, false, Color.yellow);
         }
         foreach (HalfBar halfBar in halfBars)
         {
@@ -427,7 +447,7 @@ public class Linkage : MonoBehaviour
         Vector3 pivotToAlt = altBeforeDrag - pivotBeforeDrag;
         float degreesCCWFromDownOfCentre1 = Vector3.SignedAngle(-pivotToAlt, Vector3.down, Vector3.back);
         float degreesCCWFromDownOfCentre2 = Vector3.SignedAngle(pivotToAlt, Vector3.down, Vector3.back);
-        closestHalfBar.pivotJoint.SetAngleRanges(degreesCCWFromDownOfCentre1, degreesBetweenExtremes1, showAngle1, degreesCCWFromDownOfCentre2, degreesBetweenExtremes2, showAngle2);
+        closestHalfBar.pivotJoint.SetAngleRanges(degreesCCWFromDownOfCentre1, degreesBetweenExtremes1, showAngle1, Color.red, degreesCCWFromDownOfCentre2, degreesBetweenExtremes2, showAngle2, Color.yellow);
     }
 
     Vector3 lastAdj = Vector3.zero;
@@ -479,7 +499,7 @@ public class Linkage : MonoBehaviour
     public void OnEndDragHalfBar(PointerEventData eventData)
     {
         // Optional: Handle end drag logic if needed
-        closestHalfBar.pivotJoint.SetAngleRanges(0f, 0f, false, 0f, 0f, false);
+        closestHalfBar.pivotJoint.SetAngleRanges(0f, 0f, false, Color.red, 0f, 0f, false, Color.yellow);
         closestHalfBar = null;
     }
 
