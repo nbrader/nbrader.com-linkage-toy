@@ -14,6 +14,7 @@ public enum LinkagePartType
 /// constraint of being less than min distance imposed by the opposing bars and similarly for being
 /// more than max distance imposed by the opposing bars.
 /// 
+/// Proof sketch:
 /// For one, a pair of adjacent bars has a sum of lengths either less than, equal to or more than that
 /// of the opposing pair of bars and in each of those cases the opposing bars therefore have a sum of
 /// lengths that is more than, equal to or less than the first pair respectively.
