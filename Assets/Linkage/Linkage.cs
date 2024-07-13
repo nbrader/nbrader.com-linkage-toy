@@ -110,7 +110,6 @@ public class Linkage : MonoBehaviour
 
             // Calculate the position and scale for the full bar
             Vector3 direction = nextJoint.position - currentJoint.position;
-            float distance = direction.magnitude;
 
             // Calculate and update half bar positions, rotations, and scales
             Vector3 nextDirection = (nextJoint.position - currentJoint.position) / 2;
